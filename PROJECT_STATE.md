@@ -4,8 +4,8 @@ Last updated: 2026-08-27
 Current artwork/runtime version: `1.0.28`  
 Current visual engine version: `1.0.28`  
 Current config schema: `1`  
-Repository: `perfumeJaguar/perfumeJaguar.github.io`  
-Path: `experiments/p5-media-lab/`
+Repository: `perfumeJaguar/dodrei-pages-test`  
+Path: `/`
 
 ## Current baseline
 
