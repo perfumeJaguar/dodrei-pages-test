@@ -1,0 +1,41 @@
+name: Sync DODREI snapshot
+
+on:
+  push:
+    paths:
+      - '.github/workflows/sync-dodrei.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout staging repository
+        uses: actions/checkout@v4
+
+      - name: Fetch current DODREI from source repository
+        run: |
+          git clone --depth 1 --filter=blob:none --sparse https://github.com/perfumeJaguar/perfumeJaguar.github.io.git /tmp/dodrei-source
+          git -C /tmp/dodrei-source sparse-checkout set experiments/p5-media-lab
+
+      - name: Mirror DODREI into repository root
+        run: |
+          rsync -a --delete \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            /tmp/dodrei-source/experiments/p5-media-lab/ ./
+
+      - name: Commit mirrored snapshot
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          if git diff --cached --quiet; then
+            echo 'No DODREI changes to commit.'
+            exit 0
+          fi
+          git commit -m 'Mirror current DODREI v1.0.28 snapshot'
+          git push
