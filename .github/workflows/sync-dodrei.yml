@@ -27,6 +27,26 @@ jobs:
             --exclude='.git/' \
             --exclude='.github/' \
             /tmp/dodrei-source/experiments/p5-media-lab/ ./
+          touch .nojekyll
+
+      - name: Adapt mirror to staging repository
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          config = Path('config.js')
+          text = config.read_text()
+          text = text.replace('githubRepo:"perfumeJaguar.github.io"', 'githubRepo:"dodrei-pages-test"')
+          text = text.replace('githubImageDir:"experiments/p5-media-lab/assets/images"', 'githubImageDir:"assets/images"')
+          config.write_text(text)
+
+          state = Path('PROJECT_STATE.md')
+          if state.exists():
+              text = state.read_text()
+              text = text.replace('Repository: `perfumeJaguar/perfumeJaguar.github.io`', 'Repository: `perfumeJaguar/dodrei-pages-test`')
+              text = text.replace('Path: `experiments/p5-media-lab/`', 'Path: `/`')
+              state.write_text(text)
+          PY
 
       - name: Commit mirrored snapshot
         run: |
@@ -37,5 +57,5 @@ jobs:
             echo 'No DODREI changes to commit.'
             exit 0
           fi
-          git commit -m 'Mirror current DODREI v1.0.28 snapshot'
+          git commit -m 'Mirror current DODREI staging snapshot'
           git push
